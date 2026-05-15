@@ -1,7 +1,5 @@
 package com.pdfchat.controller;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pdfchat.dto.AskRequest;
 import com.pdfchat.dto.AskResponse;
 import com.pdfchat.dto.UploadResponse;
@@ -9,18 +7,9 @@ import com.pdfchat.service.PdfIngestionService;
 import com.pdfchat.service.RagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import com.fasterxml.jackson.core.*;
 
 @Slf4j
 @RestController
@@ -34,7 +23,7 @@ public class PdfChatController {
 
     @GetMapping("/")
     public String home() {
-        return "Chat with Spring OpenAI is running!";
+        return "Finley AI is running!";
     }
 
     @PostMapping("/upload_pdf")

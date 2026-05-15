@@ -9,14 +9,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
+        <version>3.5.13</version>
         <relativePath/>
     </parent>
 
     <groupId>com.pdfchat</groupId>
     <artifactId>pdf-chat-spring</artifactId>
     <version>1.0.0</version>
-    <name>PDF Chat Spring AI</name>
+    <name>Finley AI</name>
     <description>RAG-based PDF Chat using Spring AI, OpenAI embeddings, and Pinecone</description>
 
     <properties>
