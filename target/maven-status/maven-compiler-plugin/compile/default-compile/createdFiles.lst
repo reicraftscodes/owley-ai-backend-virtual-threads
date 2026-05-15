@@ -1,12 +1,15 @@
 com\pdfchat\service\PdfIngestionService.class
 com\pdfchat\controller\GlobalExceptionHandler.class
+com\pdfchat\service\cloudinary\CloudinaryService.class
 com\pdfchat\dto\AskRequest.class
 com\pdfchat\dto\AskResponse$AskResponseBuilder.class
 com\pdfchat\service\RagService.class
 com\pdfchat\controller\PdfChatController.class
+com\pdfchat\config\CloudinaryConfig.class
 com\pdfchat\PdfChatApplication.class
 com\pdfchat\dto\UploadResponse.class
 com\pdfchat\dto\AskResponse.class
 com\pdfchat\controller\PdfChatController$ErrorResponse.class
+com\pdfchat\controller\cloudinary\CloudinaryController.class
 com\pdfchat\config\ChatClientConfig.class
 com\pdfchat\dto\UploadResponse$UploadResponseBuilder.class

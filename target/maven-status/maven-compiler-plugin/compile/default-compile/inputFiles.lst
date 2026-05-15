@@ -1,9 +1,12 @@
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\config\ChatClientConfig.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\controller\GlobalExceptionHandler.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\controller\PdfChatController.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\dto\AskRequest.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\dto\AskResponse.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\dto\UploadResponse.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\PdfChatApplication.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\service\PdfIngestionService.java
-C:\Users\John Brix Pomoy\Documents\Github\spring-ai-rag-chat\src\main\java\com\pdfchat\service\RagService.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\config\ChatClientConfig.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\config\CloudinaryConfig.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\controller\cloudinary\CloudinaryController.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\controller\GlobalExceptionHandler.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\controller\PdfChatController.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\dto\AskRequest.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\dto\AskResponse.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\dto\UploadResponse.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\PdfChatApplication.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\service\cloudinary\CloudinaryService.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\service\PdfIngestionService.java
+D:\rag-spring-ai\src\main\java\com\pdfchat\service\RagService.java

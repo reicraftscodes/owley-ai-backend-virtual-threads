@@ -15,11 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Python equivalent
- *  embed_text(question)              -> EmbeddingModel (auto via VectorStore)
- *  index.query(vector, top_k=5)      -> vectorStore.similaritySearch()
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -69,7 +64,7 @@ public class RagService {
                 ))
         ).call().content();
 
-        //OPEN AI RESPONSE
+        //OpenAI response
         return AskResponse.builder()
                 .output_text(answer)
                 .sources(sources)
