@@ -6,11 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-/**
- * Configures the Spring AI ChatClient bean.
- * Spring AI auto-wires OpenAiChatModel from application.properties,
- * this just wraps it in the fluent ChatClient API.
- */
+
 @Configuration
 public class ChatClientConfig {
 
