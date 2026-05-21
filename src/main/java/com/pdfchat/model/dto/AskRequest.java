@@ -1,4 +1,4 @@
-package com.pdfchat.dto;
+package com.pdfchat.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

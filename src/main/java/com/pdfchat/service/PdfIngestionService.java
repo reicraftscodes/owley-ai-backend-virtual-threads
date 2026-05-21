@@ -1,6 +1,6 @@
 package com.pdfchat.service;
 
-import com.pdfchat.dto.UploadResponse;
+import com.pdfchat.model.dto.UploadResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;

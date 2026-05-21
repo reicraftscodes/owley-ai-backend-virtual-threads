@@ -1,8 +1,8 @@
 package com.pdfchat.controller;
 
-import com.pdfchat.dto.AskRequest;
-import com.pdfchat.dto.AskResponse;
-import com.pdfchat.dto.UploadResponse;
+import com.pdfchat.model.dto.AskRequest;
+import com.pdfchat.model.dto.AskResponse;
+import com.pdfchat.model.dto.UploadResponse;
 import com.pdfchat.service.PdfIngestionService;
 import com.pdfchat.service.RagService;
 import lombok.RequiredArgsConstructor;

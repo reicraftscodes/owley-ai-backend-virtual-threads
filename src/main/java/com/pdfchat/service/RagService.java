@@ -1,6 +1,6 @@
 package com.pdfchat.service;
 
-import com.pdfchat.dto.AskResponse;
+import com.pdfchat.model.dto.AskResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
