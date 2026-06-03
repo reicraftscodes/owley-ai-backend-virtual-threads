@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PdfChatApplication {
+public class OwleyApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PdfChatApplication.class, args);
+        SpringApplication.run(OwleyApplication.class, args);
     }
 }
