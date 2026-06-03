@@ -1,33 +1,50 @@
 package com.pdfchat.controller;
 
+import com.pdfchat.model.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("error", "File too large. Maximum size is 50MB."));
+    public ResponseEntity<ErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message("File too large. Maximum size is 50MB.")
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("error", ex.getMessage()));
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex) {
-        log.error("Unhandled exception", ex);
-        return ResponseEntity.internalServerError()
-                .body(Map.of("error", "Internal error: " + ex.getMessage()));
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        return ResponseEntity.internalServerError().body(ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build());
     }
 }
