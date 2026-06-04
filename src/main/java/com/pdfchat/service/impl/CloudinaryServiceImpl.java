@@ -1,6 +1,7 @@
 package com.pdfchat.service.impl;
 
 import com.cloudinary.Cloudinary;
+import com.pdfchat.constants.CloudinaryConstant;
 import com.pdfchat.service.CloudinaryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.pdfchat.constants.CloudinaryConstant.CLOUDINARY_URL_TEMPLATE;
 
 @Slf4j
 @Service
@@ -46,7 +49,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     @Override
     public String getPdfUrl(String publicId) {
-        return "https://res.cloudinary.com/" + cloudName + "/raw/upload/" + pdfFolder + "/" + publicId;
+        return CLOUDINARY_URL_TEMPLATE + cloudName + "/raw/upload/" + pdfFolder + "/" + publicId;
     }
 
     private void validateImage(MultipartFile file) {
@@ -54,7 +57,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         String name = file.getOriginalFilename();
 
         if (file.isEmpty() || name == null) {
-            throw new IllegalArgumentException("Invalid image file");
+            throw new IllegalArgumentException(CloudinaryConstant.INVALID_IMAGE);
         }
 
         String lower = name.toLowerCase();
@@ -63,7 +66,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 lower.endsWith(".jpg") ||
                 lower.endsWith(".webp") ||
                 lower.endsWith(".jpeg"))) {
-            throw new IllegalArgumentException("Only PNG, JPG, JPEG, WEBP allowed");
+            throw new IllegalArgumentException(CloudinaryConstant.ONLY_FILES_ALLOWED);
         }
     }
 
@@ -87,12 +90,12 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     @Override
     public String getImageUrl(String publicId) {
-        return "https://res.cloudinary.com/" + cloudName + "/image/upload/" + imageFolder + "/" + publicId;
+        return CLOUDINARY_URL_TEMPLATE + cloudName + "/image/upload/" + imageFolder + "/" + publicId;
     }
 
     private static void validateFile(MultipartFile file, String type) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("No file provided");
+            throw new IllegalArgumentException(CloudinaryConstant.NO_FILE_PROVIDED);
         }
         String name = file.getOriginalFilename();
         if (name == null || !name.toLowerCase().endsWith(type)) {
