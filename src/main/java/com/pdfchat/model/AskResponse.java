@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class AskResponse {
     private String outputText;
-    private List<String> sources;
+//    private List<String> sources;
     private String resultMessage;
     private Boolean result;
 }

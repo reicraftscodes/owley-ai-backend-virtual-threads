@@ -11,6 +11,5 @@ public class UploadResponse {
     private String status;
     private int indexedChunks;
     private String file;
-    private String cloudinaryUrl;
     private LocalDateTime uploadTime;
 }

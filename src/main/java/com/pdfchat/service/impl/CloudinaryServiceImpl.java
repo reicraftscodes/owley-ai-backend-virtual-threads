@@ -36,6 +36,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 "folder", pdfFolder,
                 "public_id", publicId,
                 "resource_type", "raw",
+                "type", "authenticated",
                 "overwrite", false
         );
         cloudinary.uploader().upload(file.getBytes(), uploadParams);
@@ -75,6 +76,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 "folder", imageFolder,
                 "public_id", publicId,
                 "resource_type", "image",
+                "type", "authenticated",
                 "overwrite", false
         );
 

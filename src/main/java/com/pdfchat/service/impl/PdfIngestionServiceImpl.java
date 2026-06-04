@@ -1,8 +1,8 @@
 package com.pdfchat.service.impl;
 
+import com.pdfchat.model.UploadResponse;
 import com.pdfchat.entity.DocumentEntity;
 import com.pdfchat.model.DocumentStatus;
-import com.pdfchat.model.UploadResponse;
 import com.pdfchat.repository.DocumentRepository;
 import com.pdfchat.service.CloudinaryService;
 import com.pdfchat.service.PdfIngestionService;
@@ -109,7 +109,7 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
                 .status(UPLOAD_RESULT_SUCCESS)
                 .indexedChunks(chunks.size())
                 .file(filename)
-                .cloudinaryUrl(cloudinaryUrl)
+//                .cloudinaryUrl(cloudinaryUrl)
                 .uploadTime(uploadTime)
                 .build();
     }
