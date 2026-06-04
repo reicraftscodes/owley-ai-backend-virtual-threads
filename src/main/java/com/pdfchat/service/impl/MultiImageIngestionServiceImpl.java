@@ -124,7 +124,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
                 .status(UPLOAD_RESULT_SUCCESS)
                 .indexedChunks(allChunks.size())
                 .file(filename)
-                .cloudinaryUrl(cloudinaryUrl)
+//                .cloudinaryUrl(cloudinaryUrl)
                 .uploadTime(uploadTime)
                 .build();
     }

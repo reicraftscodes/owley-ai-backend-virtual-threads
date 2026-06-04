@@ -41,7 +41,8 @@ public class RagServiceImpl implements RagService {
 
         // build context and collect sources from retrieved chunks
         String context = buildContext(relevantDocs);
-        List<String> sources = extractSources(relevantDocs);
+
+//        List<String> sources = extractSources(relevantDocs);
 
         // send the context and question to OpenAI and get the answer
         String answer = callChatModel(context, question);
@@ -49,7 +50,7 @@ public class RagServiceImpl implements RagService {
         // return the answer along with sources and a success status
         return AskResponse.builder()
                 .outputText(answer)
-                .sources(sources)
+//                .sources(sources)
                 .result(true)
                 .resultMessage(RESULT_SUCCESS)
                 .build();
