@@ -82,10 +82,7 @@ public class RagServiceImpl implements RagService {
                     String url = (String) doc.getMetadata()
                             .getOrDefault(META_URL, "");
 
-                    return "[SOURCE: " + source +
-                            " | TYPE: " + type +
-                            (url.isBlank() ? "" : " | URL: " + url) +
-                            "]\n" + text;
+                    return "[SOURCE: " + source + " | TYPE: " + type + (url.isBlank() ? "" : " | URL: " + url) + "]\n" + text;
                 })
                 .collect(Collectors.joining(CONTEXT_SEPARATOR));
     }
