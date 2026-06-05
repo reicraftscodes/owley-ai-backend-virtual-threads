@@ -13,6 +13,8 @@ With Owley Policy Reader, you can:
 
 This tool is great for reading policy documents with large amounts of text. It helps you quickly turn documents into useful information.
 
+To see the **UI frontend** for this project, see [owley-ai-frontend](https://github.com/reicraftscodes/owley-ai-frontend) repository.
+
 ## Prerequisites
 - Java 21 + Virtual Threads
 - Pinecone API
