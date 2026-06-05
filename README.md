@@ -1,7 +1,7 @@
-# Owley Policy Reader
+# Owley AI
 
-Owley Policy Reader is a Spring Boot application for document intelligence. Upload PDFs or images, extract their content, and ask questions in natural language. Using RAG, Pinecone, and OpenAI, the application retrieves relevant document context to generate answers that are grounded in the uploaded content, reducing hallucinations and improving response accuracy.
-Upload PDFs and images.
+Owley AI is a Spring Boot application for analysing policy documents. Users can upload PDFs or images, extract their content, and ask questions in natural language. Using RAG, Pinecone, and OpenAI, the application retrieves relevant document context to generate answers grounded in the uploaded content, reducing hallucinations and improving response accuracy. Supports PDF and image uploads.
+
 
 With Owley Policy Reader, you can:
 
@@ -11,9 +11,10 @@ With Owley Policy Reader, you can:
 - Use Pinecone to quickly search your documents.
 - Use OpenAI to reason and give answers based only on the uploaded documents, so it won’t make things up.
 
-This tool is great for reading policies, reports, contracts, or any documents with lots of text. It helps you turn documents into useful information fast.
+This tool is great for reading policy documents with large amounts of text. It helps you quickly turn documents into useful information.
+
 ## Prerequisites
-- Java 21
+- Java 21 + Virtual Threads
 - Pinecone API
 - OpenAI API key
 - Cloudinary account
@@ -21,11 +22,9 @@ This tool is great for reading policies, reports, contracts, or any documents wi
 - MySQL
 
 ## Features
-
-- Upload PDF documents and images with acceptable file type - PNG, JPG, JPEG, WEBP (max 5)
+- Upload PDF documents and images with acceptable file type - PNG, JPG, JPEG, WEBP (max 5 per request)
 - Extract text from images using GPT-4o Vision OCR
-- Ask questions about uploaded documents and images
-- Finley AI answers in British English with a Gen Z personality
+- Ask questions in natural language and get instant AI-powered answers.
 - Secure file storage with Cloudinary (authenticated access only)
 - Vector search powered by Pinecone
 - Document records persisted in MySQL
