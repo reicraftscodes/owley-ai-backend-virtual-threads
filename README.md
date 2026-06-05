@@ -1,4 +1,4 @@
-# Owley AI
+# Owley AI (Backend Development)
 
 Owley AI is a Spring Boot application for analysing policy documents. Users can upload PDFs or images, extract their content, and ask questions in natural language. Using RAG, Pinecone, and OpenAI, the application retrieves relevant document context to generate answers grounded in the uploaded content, reducing hallucinations and improving response accuracy. Supports PDF and image uploads.
 
