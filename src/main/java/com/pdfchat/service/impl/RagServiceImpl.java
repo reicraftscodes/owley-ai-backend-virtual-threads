@@ -42,8 +42,6 @@ public class RagServiceImpl implements RagService {
         // build context and collect sources from retrieved chunks
         String context = buildContext(relevantDocs);
 
-//        List<String> sources = extractSources(relevantDocs);
-
         // send the context and question to OpenAI and get the answer
         String answer = callChatModel(context, question);
 
@@ -85,25 +83,6 @@ public class RagServiceImpl implements RagService {
                     return "[SOURCE: " + source + " | TYPE: " + type + (url.isBlank() ? "" : " | URL: " + url) + "]\n" + text;
                 })
                 .collect(Collectors.joining(CONTEXT_SEPARATOR));
-    }
-
-    // collect distinct source filenames + URLs (IMPROVED for images + PDFs)
-    private static List<String> extractSources(List<Document> relevantDocs) {
-        return relevantDocs.stream()
-                .map(doc -> {
-
-                    String source = (String) doc.getMetadata()
-                            .getOrDefault(META_SOURCE, SOURCE_UNKNOWN);
-
-                    String url = (String) doc.getMetadata()
-                            .getOrDefault(META_URL, "");
-
-                    return url.isBlank()
-                            ? source
-                            : source + " : " + url;
-                })
-                .distinct()
-                .collect(Collectors.toList());
     }
 
     // send the context and question to OpenAI using system + user prompts

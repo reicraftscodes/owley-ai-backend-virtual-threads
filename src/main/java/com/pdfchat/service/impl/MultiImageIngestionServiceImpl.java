@@ -48,7 +48,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
     @Override
     public UploadResponse ingestImages(MultipartFile[] files) throws IOException {
 
-        // validate batch request — max 5 images, not null, not empty
+        // validate batch request
         imageValidationService.validateBatch(files);
 
         LocalDateTime uploadTime = LocalDateTime.now();
@@ -124,7 +124,6 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
                 .status(UPLOAD_RESULT_SUCCESS)
                 .indexedChunks(allChunks.size())
                 .file(filename)
-//                .cloudinaryUrl(cloudinaryUrl)
                 .uploadTime(uploadTime)
                 .build();
     }

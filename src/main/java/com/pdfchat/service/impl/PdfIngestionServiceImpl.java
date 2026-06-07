@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,7 +68,7 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
         log.info(CLOUDINARY_URL_RECEIVED, cloudinaryUrl);
 
         // record the upload in the database with status PROCESSING, Cloudinary URL and upload time
-        LocalDateTime uploadTime = LocalDateTime.now();
+        LocalDateTime uploadTime = LocalDateTime.now(ZoneId.systemDefault());
         String filename = sanitizeFilename(file.getOriginalFilename());
 
         // create and persist a new document record with status PROCESSING
@@ -127,14 +129,16 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
 
     // enrich raw document pages with source filename, page number and Cloudinary URL as metadata
     private static List<Document> tagDocumentsWithMetadata(List<Document> rawDocs, String filename, String cloudinaryUrl) {
-        return rawDocs.stream()
-                .map(doc -> new Document(
-                        doc.getText(),
-                        Map.of("source", filename,
-                                "page", doc.getMetadata().getOrDefault("page_number", "?"),
-                                "cloudinary_url", cloudinaryUrl)
-                ))
-                .collect(Collectors.toList());
+        List<Document> list = new ArrayList<>();
+        for (Document doc : rawDocs) {
+            Document document = new Document(doc.getText(),
+                    Map.of("source", filename,
+                            "page", doc.getMetadata().getOrDefault("page_number", "?"),
+                            "cloudinary_url", cloudinaryUrl)
+            );
+            list.add(document);
+        }
+        return list;
     }
 
     // create a new PdfDocument record, set initial status to PROCESSING and persist to the database
@@ -174,9 +178,11 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
                 SearchRequest.builder().query(" ").topK(MAX_VECTOR_CLEAR_LIMIT).build()
         );
         if (!existing.isEmpty()) {
-            List<String> ids = existing.stream()
-                    .map(Document::getId)
-                    .collect(Collectors.toList());
+            List<String> ids = new ArrayList<>();
+            for (Document document : existing) {
+                String id = document.getId();
+                ids.add(id);
+            }
             vectorStore.delete(ids);
             log.info(VECTORS_CLEARED, ids.size());
         }
