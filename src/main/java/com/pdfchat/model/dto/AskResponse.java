@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AskResponse {
-    private String output_text;
+    private String outputText;
     private List<String> sources;
     private String resultMessage;
     private Boolean result;
