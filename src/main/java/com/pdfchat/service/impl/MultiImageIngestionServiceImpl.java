@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
         // validate batch request
         imageValidationService.validateBatch(files);
 
-        LocalDateTime uploadTime = LocalDateTime.now();
+        LocalDateTime uploadTime = LocalDateTime.now(ZoneId.systemDefault());
         List<Document> allChunks = new ArrayList<>();
 
         String filename = null;
