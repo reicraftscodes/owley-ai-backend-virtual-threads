@@ -20,7 +20,7 @@ import static com.pdfchat.constants.DocumentIngestionConstant.QUESTION_REQUIRED_
 @Slf4j
 @RestController
 @RequestMapping("/api/documents")
-@CrossOrigin
+@CrossOrigin("http://localhost:5000/")
 public class DocumentController {
 
     @Autowired
