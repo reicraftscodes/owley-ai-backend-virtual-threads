@@ -1,5 +1,6 @@
 package com.pdfchat.service.impl;
 
+import com.pdfchat.model.DocumentType;
 import com.pdfchat.model.UploadResponse;
 import com.pdfchat.entity.DocumentEntity;
 import com.pdfchat.model.DocumentStatus;
@@ -111,7 +112,6 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
                 .status(UPLOAD_RESULT_SUCCESS)
                 .indexedChunks(chunks.size())
                 .file(filename)
-//                .cloudinaryUrl(cloudinaryUrl)
                 .uploadTime(uploadTime)
                 .build();
     }
@@ -145,6 +145,8 @@ public class PdfIngestionServiceImpl implements PdfIngestionService {
     private DocumentEntity createDocumentRecord(String filename, String cloudinaryPublicId, String cloudinaryUrl, LocalDateTime uploadTime) {
         DocumentEntity docRecord = new DocumentEntity();
         docRecord.setFilename(filename);
+        docRecord.setType(DocumentType.PDF);
+        docRecord.setContentType("application/pdf");
         docRecord.setCloudinaryPublicId(cloudinaryPublicId);
         docRecord.setCloudinaryUrl(cloudinaryUrl);
         docRecord.setStatus(DocumentStatus.PROCESSING);

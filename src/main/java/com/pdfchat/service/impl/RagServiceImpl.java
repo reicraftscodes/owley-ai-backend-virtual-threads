@@ -48,7 +48,6 @@ public class RagServiceImpl implements RagService {
         // return the answer along with sources and a success status
         return AskResponse.builder()
                 .outputText(answer)
-//                .sources(sources)
                 .result(true)
                 .resultMessage(RESULT_SUCCESS)
                 .build();
