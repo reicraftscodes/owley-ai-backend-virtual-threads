@@ -29,6 +29,8 @@ To see the **UI frontend** for this project, see [owley-ai-frontend](https://git
 
 
 ## Architecture Overview
+![c4 diagram](https://res.cloudinary.com/dvwxun4vh/image/upload/v1783511449/PLBDZjD03BxdAKmFg1LjSzaJf-tFibffLoqjXUFAoPZkQ2SpmzXXgH0Ixy0RyYHueYYqa4F6O_lxldnshbamITkuufNrjMiDjSd1aqZajsMPy6L-jFBKLYrJgeCNyZAlGrD6Xpx3PYp6sQfSNSssENLuk2yRPA6agSUL8j1wIlEO9GgnuWWsBuvEiBY3tpz_mT02Qul7X4rHR2bnyECi.png_wvzjha.png)
+
 Owley AI follows a Retrieval-Augmented Generation (RAG) workflow:
 
 - Documents are uploaded and processed (PDF or image OCR)
@@ -37,6 +39,7 @@ Owley AI follows a Retrieval-Augmented Generation (RAG) workflow:
 - Relevant content is retrieved based on the user’s query
 - Retrieved context is combined with prompts and sent to OpenAI
 - A grounded, context-aware response is returned to the user
+
 
 ### Sequence Diagrams
 
