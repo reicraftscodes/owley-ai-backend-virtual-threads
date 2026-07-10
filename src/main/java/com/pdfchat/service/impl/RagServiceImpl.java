@@ -70,14 +70,11 @@ public class RagServiceImpl implements RagService {
 
                     String text = doc.getText();
 
-                    String source = (String) doc.getMetadata()
-                            .getOrDefault(META_SOURCE, SOURCE_UNKNOWN);
+                    String source = (String) doc.getMetadata().getOrDefault(META_SOURCE, SOURCE_UNKNOWN);
 
-                    String type = (String) doc.getMetadata()
-                            .getOrDefault(META_TYPE, "UNKNOWN");
+                    String type = (String) doc.getMetadata().getOrDefault(META_TYPE, "UNKNOWN");
 
-                    String url = (String) doc.getMetadata()
-                            .getOrDefault(META_URL, "");
+                    String url = (String) doc.getMetadata().getOrDefault(META_URL, "");
 
                     return "[SOURCE: " + source + " | TYPE: " + type + (url.isBlank() ? "" : " | URL: " + url) + "]\n" + text;
                 })
