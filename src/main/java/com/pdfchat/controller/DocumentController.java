@@ -47,10 +47,6 @@ public class DocumentController {
 
     @PostMapping("/ask")
     public ResponseEntity<AskResponse> ask(@RequestBody AskRequest request) {
-        if (request.getQuestion() == null || request.getQuestion().isBlank()) {
-            throw new IllegalArgumentException(QUESTION_REQUIRED_MESSAGE);
-        }
-
         AskResponse response = ragService.ask(request.getQuestion().trim());
         return ResponseEntity.ok(response);
     }

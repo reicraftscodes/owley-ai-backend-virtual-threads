@@ -4,7 +4,7 @@ import com.pdfchat.entity.DocumentEntity;
 import com.pdfchat.model.DocumentStatus;
 import com.pdfchat.model.DocumentType;
 import com.pdfchat.model.UploadResponse;
-import com.pdfchat.repository.ImagesDocumentRepository;
+import com.pdfchat.repository.DocumentRepository;
 import com.pdfchat.service.CloudinaryService;
 import com.pdfchat.service.ImageValidationService;
 import com.pdfchat.service.MultiImageIngestionService;
@@ -38,7 +38,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
     private CloudinaryService cloudinaryService;
 
     @Autowired
-    private ImagesDocumentRepository imagesDocumentRepository;
+    private DocumentRepository documentRepository;
 
     @Autowired
     private OcrService ocrService;
@@ -53,6 +53,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
         imageValidationService.validateBatch(files);
 
         LocalDateTime uploadTime = LocalDateTime.now(ZoneId.systemDefault());
+
         List<Document> allChunks = new ArrayList<>();
 
         String filename = null;
@@ -109,7 +110,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
         // fail if no usable text from any image
         if (allChunks.isEmpty()) {
             docRecord.setStatus(DocumentStatus.FAILED);
-            imagesDocumentRepository.save(docRecord);
+            documentRepository.save(docRecord);
             throw new IllegalArgumentException(NO_TEXT_FOUND_MESSAGE);
         }
 
@@ -119,7 +120,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
 
         // mark complete
         docRecord.setStatus(DocumentStatus.READY);
-        imagesDocumentRepository.save(docRecord);
+        documentRepository.save(docRecord);
 
         return UploadResponse.builder()
                 .status(UPLOAD_RESULT_SUCCESS)
@@ -148,7 +149,7 @@ public class MultiImageIngestionServiceImpl implements MultiImageIngestionServic
         doc.setStatus(DocumentStatus.PROCESSING);
         doc.setUploadTime(uploadTime);
 
-        return imagesDocumentRepository.save(doc);
+        return documentRepository.save(doc);
     }
 
     // clear vectors
