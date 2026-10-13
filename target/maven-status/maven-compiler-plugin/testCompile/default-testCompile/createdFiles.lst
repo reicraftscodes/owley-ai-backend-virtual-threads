@@ -1,4 +1,0 @@
-com\pdfchat\controller\DocumentControllerTests.class
-com\pdfchat\service\OcrServiceTests.class
-com\pdfchat\service\impl\PdfIngestionServiceTests.class
-com\pdfchat\service\RagServiceTests.class
