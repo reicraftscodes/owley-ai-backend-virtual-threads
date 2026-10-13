@@ -3,10 +3,9 @@ package com.pdfchat.service;
 import com.pdfchat.constants.PromptConstant;
 import com.pdfchat.model.AskResponse;
 import com.pdfchat.service.impl.RagServiceImpl;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,8 +22,10 @@ import java.util.Map;
 import static com.pdfchat.constants.RagConstant.CONTEXT_SEPARATOR;
 import static com.pdfchat.constants.RagConstant.RESULT_SUCCESS;
 import static com.pdfchat.constants.RagConstant.TOP_K;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,137 +34,200 @@ class RagServiceTests {
 
     private static final String QUESTION = "What is the password policy?";
     private static final String FAKE_ANSWER = "Passwords must be at least 12 characters.";
+    private static final String NO_ANSWER_TEXT = "The answer is not available in the provided document.";
     private static final String FAKE_URL = "https://cloudinary.test/policy.pdf";
+    private static final String BLANK_URL = "";
+    private static final String PASSWORD_CHUNK = "Passwords need 12 characters.";
+    private static final String FIRST_CHUNK = "First chunk.";
+    private static final String SECOND_CHUNK = "Second chunk.";
+    private static final String SOURCE_FILE = "policy.pdf";
+    private static final String FIRST_SOURCE_FILE = "one.pdf";
+    private static final String SECOND_SOURCE_FILE = "two.pdf";
+    private static final String DOC_TYPE_PDF = "PDF";
+    private static final String METADATA_SOURCE = "source";
+    private static final String METADATA_TYPE = "type";
+    private static final String METADATA_CLOUDINARY_URL = "cloudinary_url";
+    private static final String URL_LABEL = "URL:";
+    private static final String CONTEXT_PREFIX = "Context:\n\n";
+    private static final String HEADER_WITH_URL = "[SOURCE: policy.pdf | TYPE: PDF | URL: " + FAKE_URL + "]\n";
+    private static final String HEADER_WITHOUT_URL = "[SOURCE: policy.pdf | TYPE: PDF]\n";
+    private static final String HEADER_WITH_DEFAULTS = "[SOURCE: unknown | TYPE: UNKNOWN]\n";
+    private static final String FIRST_HEADER = "[SOURCE: one.pdf | TYPE: PDF]\n";
+    private static final String SECOND_HEADER = "[SOURCE: two.pdf | TYPE: PDF]\n";
+    private static final int SYSTEM_MESSAGE_INDEX = 0;
+    private static final int USER_MESSAGE_INDEX = 1;
 
     @Mock
     private VectorStore vectorStore;
 
-    // deep stubs let the mock answer the chained call chatClient.prompt(...).call().content()
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    @Mock
     private ChatClient chatClient;
+
+    @Mock
+    private ChatClient.ChatClientRequestSpec requestSpec;
+
+    @Mock
+    private ChatClient.CallResponseSpec callResponseSpec;
 
     @InjectMocks
     private RagServiceImpl ragService;
 
+    /**
+     * Stubs the vector store so the similarity search finds the given documents.
+     *
+     * @param documents the documents the search should return, may be empty
+     */
+    private void givenDocumentsFound(List<Document> documents) {
+        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(documents);
+    }
+
+    /**
+     * Stubs the ChatClient fluent chain (prompt -> call -> content) so the
+     * mocked model returns the given answer.
+     *
+     * @param modelContent the text the mocked model should return from content()
+     */
+    private void givenModelReturns(String modelContent) {
+        when(chatClient.prompt(any(Prompt.class))).thenReturn(requestSpec);
+        when(requestSpec.call()).thenReturn(callResponseSpec);
+        when(callResponseSpec.content()).thenReturn(modelContent);
+    }
+
+    /**
+     * Captures the Prompt that RagServiceImpl sent to the chat model.
+     *
+     * @return the Prompt passed to chatClient.prompt(...)
+     */
+    private Prompt capturePromptSentToModel() {
+        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatClient).prompt(promptCaptor.capture());
+        return promptCaptor.getValue();
+    }
+
+    /**
+     * Gets the user message from the prompt, the second message holds the context and question.
+     *
+     * @param prompt the prompt sent to the chat model
+     * @return the text of the user message
+     */
+    private String getUserMessage(Prompt prompt) {
+        return prompt.getInstructions().get(USER_MESSAGE_INDEX).getText();
+    }
+
     @Test
-    public void askReturnsAnswerFromChatModel() {
-        Document doc = new Document("Passwords need 12 characters.", Map.of("source", "policy.pdf"));
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc));
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("returns the answer when the chat model responds")
+    void shouldReturnAnswerWhenChatModelResponds() {
+        Document document = new Document(PASSWORD_CHUNK, Map.of(METADATA_SOURCE, SOURCE_FILE));
+        givenDocumentsFound(List.of(document));
+        givenModelReturns(FAKE_ANSWER);
 
         AskResponse response = ragService.ask(QUESTION);
 
-        Assertions.assertEquals(FAKE_ANSWER, response.getOutputText());
-        Assertions.assertTrue(response.getResult());
-        Assertions.assertEquals(RESULT_SUCCESS, response.getResultMessage());
+        assertEquals(FAKE_ANSWER, response.getOutputText());
+        assertTrue(response.getResult());
+        assertEquals(RESULT_SUCCESS, response.getResultMessage());
     }
 
     @Test
-    public void askSearchesVectorStoreWithQuestionAndTopK() {
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of());
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("searches the vector store with the question and top K")
+    void shouldSearchVectorStoreWithQuestionAndTopKWhenAsked() {
+        givenDocumentsFound(List.of());
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        ArgumentCaptor<SearchRequest> captor = ArgumentCaptor.forClass(SearchRequest.class);
-        verify(vectorStore).similaritySearch(captor.capture());
-        Assertions.assertEquals(QUESTION, captor.getValue().getQuery());
-        Assertions.assertEquals(TOP_K, captor.getValue().getTopK());
+        ArgumentCaptor<SearchRequest> searchCaptor = ArgumentCaptor.forClass(SearchRequest.class);
+        verify(vectorStore).similaritySearch(searchCaptor.capture());
+        assertEquals(QUESTION, searchCaptor.getValue().getQuery());
+        assertEquals(TOP_K, searchCaptor.getValue().getTopK());
     }
 
     @Test
-    public void askSendsSystemPromptFirstThenUserPrompt() {
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of());
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("sends the system prompt first then the user prompt")
+    void shouldSendSystemPromptFirstThenUserPromptWhenAsked() {
+        givenDocumentsFound(List.of());
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        Prompt prompt = capturePrompt();
-        Assertions.assertEquals(2, prompt.getInstructions().size());
-        Assertions.assertEquals(PromptConstant.SYSTEM_PROMPT, prompt.getInstructions().get(0).getText());
-        Assertions.assertTrue(prompt.getInstructions().get(1).getText().contains(QUESTION));
+        Prompt prompt = capturePromptSentToModel();
+        assertEquals(2, prompt.getInstructions().size());
+        assertEquals(PromptConstant.SYSTEM_PROMPT, prompt.getInstructions().get(SYSTEM_MESSAGE_INDEX).getText());
+        assertTrue(getUserMessage(prompt).contains(QUESTION));
     }
 
     @Test
-    public void contextIncludesSourceTypeAndUrl() {
-        Document doc = new Document("Passwords need 12 characters.",
-                Map.of("source", "policy.pdf", "type", "PDF", "cloudinary_url", FAKE_URL));
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc));
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("includes the source, type and URL in the context when metadata is present")
+    void shouldIncludeSourceTypeAndUrlInContextWhenMetadataIsPresent() {
+        Document document = new Document(PASSWORD_CHUNK, Map.of(
+                METADATA_SOURCE, SOURCE_FILE,
+                METADATA_TYPE, DOC_TYPE_PDF,
+                METADATA_CLOUDINARY_URL, FAKE_URL));
+        givenDocumentsFound(List.of(document));
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        String userMessage = getUserMessage(capturePrompt());
-        Assertions.assertTrue(userMessage.contains(
-                "[SOURCE: policy.pdf | TYPE: PDF | URL: " + FAKE_URL + "]\nPasswords need 12 characters."));
+        String userMessage = getUserMessage(capturePromptSentToModel());
+        assertTrue(userMessage.contains(HEADER_WITH_URL + PASSWORD_CHUNK));
     }
 
     @Test
-    public void contextLeavesOutUrlWhenBlank() {
-        Document doc = new Document("Passwords need 12 characters.",
-                Map.of("source", "policy.pdf", "type", "PDF", "cloudinary_url", ""));
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc));
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("leaves the URL out of the context when the URL is blank")
+    void shouldLeaveOutUrlFromContextWhenUrlIsBlank() {
+        Document document = new Document(PASSWORD_CHUNK, Map.of(
+                METADATA_SOURCE, SOURCE_FILE,
+                METADATA_TYPE, DOC_TYPE_PDF,
+                METADATA_CLOUDINARY_URL, BLANK_URL));
+        givenDocumentsFound(List.of(document));
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        String userMessage = getUserMessage(capturePrompt());
-
-        Assertions.assertTrue(userMessage.contains("[SOURCE: policy.pdf | TYPE: PDF]\nPasswords need 12 characters."));
-        Assertions.assertFalse(userMessage.contains("URL:"));
+        String userMessage = getUserMessage(capturePromptSentToModel());
+        assertTrue(userMessage.contains(HEADER_WITHOUT_URL + PASSWORD_CHUNK));
+        assertFalse(userMessage.contains(URL_LABEL));
     }
 
     @Test
-    public void contextUsesDefaultsWhenMetadataIsMissing() {
-        Document doc = new Document("Passwords need 12 characters.");
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc));
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("uses default values in the context when metadata is missing")
+    void shouldUseDefaultsInContextWhenMetadataIsMissing() {
+        Document document = new Document(PASSWORD_CHUNK);
+        givenDocumentsFound(List.of(document));
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        String userMessage = getUserMessage(capturePrompt());
-        Assertions.assertTrue(userMessage.contains("[SOURCE: unknown | TYPE: UNKNOWN]\nPasswords need 12 characters."));
+        String userMessage = getUserMessage(capturePromptSentToModel());
+        assertTrue(userMessage.contains(HEADER_WITH_DEFAULTS + PASSWORD_CHUNK));
     }
 
     @Test
-    public void contextJoinsAllDocumentsWithSeparator() {
-        Document first = new Document("First chunk.", Map.of("source", "one.pdf", "type", "PDF"));
-        Document second = new Document("Second chunk.", Map.of("source", "two.pdf", "type", "PDF"));
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(first, second));
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn(FAKE_ANSWER);
+    @DisplayName("joins all documents with the separator when several are found")
+    void shouldJoinAllDocumentsWithSeparatorWhenMultipleDocumentsFound() {
+        Document first = new Document(FIRST_CHUNK, Map.of(METADATA_SOURCE, FIRST_SOURCE_FILE, METADATA_TYPE, DOC_TYPE_PDF));
+        Document second = new Document(SECOND_CHUNK, Map.of(METADATA_SOURCE, SECOND_SOURCE_FILE, METADATA_TYPE, DOC_TYPE_PDF));
+        givenDocumentsFound(List.of(first, second));
+        givenModelReturns(FAKE_ANSWER);
 
         ragService.ask(QUESTION);
 
-        String userMessage = getUserMessage(capturePrompt());
-        String expectedContext = "[SOURCE: one.pdf | TYPE: PDF]\nFirst chunk."
-                + CONTEXT_SEPARATOR
-                + "[SOURCE: two.pdf | TYPE: PDF]\nSecond chunk.";
-        Assertions.assertTrue(userMessage.contains(expectedContext));
+        String userMessage = getUserMessage(capturePromptSentToModel());
+        String expectedContext = FIRST_HEADER + FIRST_CHUNK + CONTEXT_SEPARATOR + SECOND_HEADER + SECOND_CHUNK;
+        assertTrue(userMessage.contains(expectedContext));
     }
 
     @Test
-    public void askStillCallsChatModelWhenNoDocumentsFound() {
-        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of());
-        when(chatClient.prompt(any(Prompt.class)).call().content()).thenReturn("The answer is not available in the provided document.");
+    @DisplayName("still calls the chat model when no documents are found")
+    void shouldStillCallChatModelWhenNoDocumentsFound() {
+        givenDocumentsFound(List.of());
+        givenModelReturns(NO_ANSWER_TEXT);
 
         AskResponse response = ragService.ask(QUESTION);
 
         // the context is empty but the model is still asked, so it can reply that there is no answer
-        Assertions.assertEquals("The answer is not available in the provided document.", response.getOutputText());
-        Assertions.assertTrue(response.getResult());
-        Assertions.assertTrue(getUserMessage(capturePrompt()).startsWith("Context:\n\n"));
-    }
-
-    // gets the Prompt that RagServiceImpl sent to the chat model
-    private Prompt capturePrompt() {
-        ArgumentCaptor<Prompt> captor = ArgumentCaptor.forClass(Prompt.class);
-        // atLeastOnce because setting up the deep stub in the test also counts as a call, the last one is the real call
-        verify(chatClient, atLeastOnce()).prompt(captor.capture());
-        return captor.getValue();
-    }
-
-    // the second message in the prompt is the user message that holds the context and question
-    private String getUserMessage(Prompt prompt) {
-        return prompt.getInstructions().get(1).getText();
+        assertEquals(NO_ANSWER_TEXT, response.getOutputText());
+        assertTrue(response.getResult());
+        assertTrue(getUserMessage(capturePromptSentToModel()).startsWith(CONTEXT_PREFIX));
     }
 }
