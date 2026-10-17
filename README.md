@@ -23,7 +23,17 @@ Users can upload PDF files or images, extract text from documents, and ask quest
 #### Business Requirements
 Owley AI is designed to simplify the analysis of large policy documents.  The system is well suited for domains such as compliance, legal analysis, insurance, and enterprise documentation, where accuracy and contextual understanding are critical.
 
-
+## Contents
+- [Architecture Overview](#architecture-overview)
+  - [Sequence Diagrams](#sequence-diagrams)
+    - PDF Upload Sequence Diagram
+    - Image Upload Sequence Diagram
+  - [Prompt Design](#prompt-design)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Testing](#testing)
+  - [API Documentation](#api-documentation)
+- [License](#license)
 
 To see the **UI frontend** for this project, see [owley-ai-frontend](https://github.com/reicraftscodes/owley-ai-frontend) repository.
 
@@ -48,7 +58,7 @@ The following diagrams illustrate the upload workflows in Owley AI:
 - [PDF Upload Sequence Diagram](https://res.cloudinary.com/dvwxun4vh/image/upload/v1781189137/owley-pdf-sd_zlkbqy.png)
 - [Image Upload Sequence Diagram](https://res.cloudinary.com/dvwxun4vh/image/upload/v1781189138/owley-img-sd_kwafyv.png)
 
-**Prompt Design**
+#### Prompt Design
 
 Owley AI uses structured prompts within its RAG pipeline to ensure responses are accurate, consistent, and grounded in document content.
 
@@ -61,10 +71,9 @@ The prompt design ensures that the system:
 - Avoids assumptions, external knowledge, or unsupported inputs (such as links)
 - Provides a clear response when information is not available
 
-This approach combines precise retrieval with controlled AI reasoning, resulting in reliable and easy-to-understand answers. Implementation details are available in _`PromptConstant.java`_.
+This approach combines precise retrieval with controlled AI reasoning, resulting in reliable and easy-to-understand answers. Implementation details are available in [_`PromptConstant.java`_](https://github.com/reicraftscodes/owley-ai-backend-virtual-threads/blob/master/src/main/java/com/pdfchat/constants/PromptConstant.java).
 
 ## Features
-
 - User Management (Admin and General Users)
 - Upload PDF and image files (PNG, JPG, JPEG, WEBP) with a limit of 5 files per request 
 - Extract text from images using GPT‑4o Vision OCR 
@@ -83,7 +92,6 @@ This approach combines precise retrieval with controlled AI reasoning, resulting
 
 ## Testing
 This project is also being actively checked with SonarLint integrated into the developer's IDE. SonarQube analysis is performed automatically in the CI/CD pipeline, and it passes as long as there are no SonarQube violations.
-
 
 ### API Documentation
 
@@ -106,8 +114,6 @@ curl --location 'http://localhost:8081/api/documents/ask' \
 --header 'Content-Type: application/json' \
 --data '{"question": "What is this document about?"}'
 ```
-
-
 
 ## License
 This project is licensed under the MIT License
