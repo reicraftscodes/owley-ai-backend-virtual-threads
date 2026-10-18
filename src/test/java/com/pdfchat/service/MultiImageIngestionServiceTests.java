@@ -17,6 +17,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import static com.pdfchat.constants.DocumentIngestionConstant.NO_TEXT_FOUND_MESS
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MultiImageIngestionServiceTests {
 
+    // fake values returned by the mocked services, nothing is uploaded or read for real
     private static final String FAKE_PUBLIC_ID = "image-public-id";
     private static final String FAKE_CLOUDINARY_URL = "https://cloudinary.test/image-public-id.png";
     private static final String FAKE_OCR_TEXT = "This is a sample scanned page about the company password policy.";
@@ -236,13 +239,68 @@ public class MultiImageIngestionServiceTests {
         Assertions.assertEquals(DEFAULT_FILENAME, response.getFile());
     }
 
+    @Test
+    public void imageFilenameWithSpecialCharactersIsSanitised() throws IOException {
+        // everything except letters, numbers, dots, dashes and underscores is replaced with an underscore
+        MockMultipartFile image = createImage("my scan (1)@2024.png");
+        stubCloudinary(image);
+        when(ocrService.extractText(image)).thenReturn(FAKE_OCR_TEXT);
+        stubSaveReturnsSameRecord();
+
+        UploadResponse response = multiImageIngestionService.ingestImages(new MultipartFile[]{image});
+
+        Assertions.assertEquals("my_scan__1__2024.png", response.getFile());
+    }
+
+    @Test
+    public void imageWithNullFilenameUsesDefaultFilename() throws IOException {
+        // a plain mock gives a real null name (MockMultipartFile would turn it into an empty string)
+        MultipartFile image = mock(MultipartFile.class);
+        stubCloudinary(image);
+        when(ocrService.extractText(image)).thenReturn(FAKE_OCR_TEXT);
+        stubSaveReturnsSameRecord();
+
+        UploadResponse response = multiImageIngestionService.ingestImages(new MultipartFile[]{image});
+
+        Assertions.assertEquals(DEFAULT_FILENAME, response.getFile());
+    }
+
+    // trimText
+    @Test
+    public void trimTextWithNullReturnsEmptyString() {
+        String result = ReflectionTestUtils.invokeMethod(multiImageIngestionService, "trimText", null, 10);
+
+        Assertions.assertEquals("", result);
+    }
+
+    @Test
+    public void trimTextWithBlankReturnsEmptyString() {
+        String result = ReflectionTestUtils.invokeMethod(multiImageIngestionService, "trimText", "   ", 10);
+
+        Assertions.assertEquals("", result);
+    }
+
+    @Test
+    public void trimTextShorterThanLimitIsKept() {
+        String result = ReflectionTestUtils.invokeMethod(multiImageIngestionService, "trimText", "short text", 10000);
+
+        Assertions.assertEquals("short text", result);
+    }
+
+    @Test
+    public void trimTextLongerThanLimitIsCut() {
+        String result = ReflectionTestUtils.invokeMethod(multiImageIngestionService, "trimText", "abcdefghij", 4);
+
+        Assertions.assertEquals("abcd", result);
+    }
+
     // creates a small fake image file with some content so it is not empty
     private MockMultipartFile createImage(String filename) {
         return new MockMultipartFile("files", filename, "image/png", "image bytes".getBytes());
     }
 
     // makes the mocked Cloudinary service return the fake public id and url for this image
-    private void stubCloudinary(MockMultipartFile image) throws IOException {
+    private void stubCloudinary(MultipartFile image) throws IOException {
         when(cloudinaryService.uploadImage(image)).thenReturn(FAKE_PUBLIC_ID);
         when(cloudinaryService.getImageUrl(FAKE_PUBLIC_ID)).thenReturn(FAKE_CLOUDINARY_URL);
     }
